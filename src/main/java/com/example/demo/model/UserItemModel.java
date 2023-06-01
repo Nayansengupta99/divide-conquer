@@ -1,7 +1,9 @@
 package com.example.demo.model;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -11,23 +13,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Document(collection = "UserItem")
+public class UserItemModel {
 
-@Document(collection = "Users")
-public class UserModel {
-	
-	
-	
-	@Transient
-	public static final String SEQUENCE_NAME = "users_sequence";
-	
 	@Id
-	
-	private long userId;
+	@MongoId(FieldType.OBJECT_ID)
+	private String userId;
 	private String userName;
-	private int userAge;
-	
-	
-	
+	private TripModel tripModel;
+	private List<ItemModel> items;
+
+
 }
