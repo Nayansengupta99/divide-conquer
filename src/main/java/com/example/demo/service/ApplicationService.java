@@ -44,38 +44,100 @@ public class ApplicationService {
 		return userRepo.findAll();
 	}
 
+	public List<UserItemModel> getAllUserAlongWithItems() {
+		return userItemRepo.findAll();
+	}
+
 	public UserModel saveUser(UserModel model) {
-		model.setUserId(generateSequence(UserModel.SEQUENCE_NAME));
 		return userRepo.save(model);
 	}
 
-	public UserItemModel findUserByName(String userName) {
+	public UserModel findUserByName(String userName) {
+		return userRepo.findByUserName(userName);
+	}
+
+	public UserItemModel findUserItemByUserName(String userName) {
 		return userItemRepo.findByUserName(userName);
 	}
 
-	
-	
+	public TripModel getTripDetailsForTripName(String tripName) {
+		TripModel model = null;
+		List<UserItemModel> userItemList = getAllUserAlongWithItems();
+
+		for (UserItemModel m : userItemList) {
+			if (m.getTripModel().getTripName().equals(tripName)) {
+				return m.getTripModel();
+			}
+		}
+
+		return model;
+
+	}
+
 	public UserItemModel saveUserItems(UserItemModel model) {
-		if (findUserByName(model.getUserName()) == null) {
+
+		if (findUserItemByUserName(model.getUserName()) == null
+				&& getTripDetailsForTripName(model.getTripModel().getTripName()) == null) {
 
 			for (ItemModel m : model.getItems()) {
 				Instant ins = Instant.now();
 				m.setItemId(generateSequence(ItemModel.SEQUENCE_NAME));
 				m.setPurchaseDate(Date.from(ins));
 			}
-			
+			model.setId(generateSequence(UserItemModel.SEQUENCE_NAME));
+			model.setUserId(findUserByName(model.getUserName()).getUserId());
 			model.getTripModel().setTripId(generateSequence(TripModel.SEQUENCE_NAME));
 			userItemRepo.save(model);
 
 			return model;
 		}
 
-		else {
-			UserItemModel modelRef = findUserByName(model.getUserName());
+		else if (findUserItemByUserName(model.getUserName()) == null
+				&& getTripDetailsForTripName(model.getTripModel().getTripName()) != null) {
+
 			for (ItemModel m : model.getItems()) {
-				modelRef.getItems().add(m);
+				Instant ins = Instant.now();
+				m.setItemId(generateSequence(ItemModel.SEQUENCE_NAME));
+				m.setPurchaseDate(Date.from(ins));
+			}
+			model.setId(generateSequence(UserItemModel.SEQUENCE_NAME));
+			model.setUserId(findUserByName(model.getUserName()).getUserId());
+			model.getTripModel().setTripId(getTripDetailsForTripName(model.getTripModel().getTripName()).getTripId());
+			userItemRepo.save(model);
+
+			return model;
+
+		}
+
+		else if (findUserItemByUserName(model.getUserName()) != null
+				&& getTripDetailsForTripName(model.getTripModel().getTripName()) == null) {
+
+			for (ItemModel m : model.getItems()) {
+				Instant ins = Instant.now();
+				m.setItemId(generateSequence(ItemModel.SEQUENCE_NAME));
+				m.setPurchaseDate(Date.from(ins));
 			}
 
+			model.setId(generateSequence(UserItemModel.SEQUENCE_NAME));
+			model.setUserId(findUserByName(model.getUserName()).getUserId());
+			model.getTripModel().setTripId(generateSequence(TripModel.SEQUENCE_NAME));
+			userItemRepo.save(model);
+
+			return model;
+
+		}
+
+		else {
+			UserItemModel modelRef = findUserItemByUserName(model.getUserName());
+
+			for (ItemModel m : model.getItems()) {
+				Instant ins = Instant.now();
+				modelRef.getItems().add(m);
+				m.setItemId(generateSequence(ItemModel.SEQUENCE_NAME));
+				m.setPurchaseDate(Date.from(ins));
+			}
+
+			userItemRepo.save(modelRef);
 			return modelRef;
 		}
 

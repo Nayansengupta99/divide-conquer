@@ -28,7 +28,7 @@ public class ApplicationController {
 
 	@GetMapping("/{userName}")
 	public UserItemModel findUserItemByName(@PathVariable String userName) {
-		return appService.findUserByName(userName);
+		return appService.findUserItemByUserName(userName);
 	}
 
 	@PostMapping("/saveuseritems")

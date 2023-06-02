@@ -19,12 +19,11 @@ public class UserModel {
 	
 	
 	
-	@Transient
-	public static final String SEQUENCE_NAME = "users_sequence";
+	
 	
 	@Id
-	
-	private long userId;
+	@MongoId(FieldType.OBJECT_ID)
+	private String userId;
 	private String userName;
 	private int userAge;
 	
