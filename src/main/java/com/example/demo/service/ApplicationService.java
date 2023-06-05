@@ -5,7 +5,13 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -19,6 +25,7 @@ import com.example.demo.model.UserItemModel;
 import com.example.demo.model.UserModel;
 import com.example.demo.repository.AppUserItemRepository;
 import com.example.demo.repository.AppUserRepository;
+import com.example.demo.util.Util;
 
 @Service
 public class ApplicationService {
@@ -141,6 +148,72 @@ public class ApplicationService {
 			return modelRef;
 		}
 
+	}
+
+	public double getTotalExpenditureforUserName(String tripName, String userName) {
+
+		double totalSum = 0.0f;
+
+		UserItemModel model = new UserItemModel();
+
+		for (UserItemModel m : getAllUserAlongWithItems()) {
+
+			if (m.getTripModel().getTripName().toLowerCase().equals(tripName.toLowerCase())
+					&& m.getUserName().equalsIgnoreCase(userName)) {
+				model = m;
+			}
+		}
+
+		for (ItemModel m : model.getItems()) {
+
+			totalSum += m.getItemPrice();
+		}
+		return totalSum;
+	}
+
+	public Map<String, Double> getEveryOneTotalExpenditure(String tripName) {
+
+		List<UserItemModel> userItemList = getAllUserAlongWithItems();
+
+		TreeMap<String, Double> userPriceMap = new TreeMap<String, Double>();
+
+		for (UserItemModel m : userItemList) {
+			if (m.getTripModel().getTripName().equalsIgnoreCase(tripName)) {
+				userPriceMap.put(m.getUserName(), getTotalExpenditureforUserName(tripName, m.getUserName()));
+			}
+		}
+
+		Util util = new Util();
+
+		Map<String, Double> sorteduserPriceMap = util.sortByValues(userPriceMap);
+		Map<String, Double> reverseSorteduserPriceMap = new TreeMap<>(Collections.reverseOrder());
+		reverseSorteduserPriceMap.putAll(sorteduserPriceMap);
+
+		return sorteduserPriceMap;
+
+	}
+
+	public Map<String, Double> getEachUserShare(String tripName) {
+
+		double totalExpenditure = 0.0;
+		Map<String, Double> userItemMap = getEveryOneTotalExpenditure(tripName);
+
+		for (Map.Entry<String, Double> map : userItemMap.entrySet()) {
+			totalExpenditure += map.getValue();
+		}
+
+		Map<String, Double> eachShareMap = new HashMap<String, Double>();
+		for (Map.Entry<String, Double> map : userItemMap.entrySet()) {
+			if (totalExpenditure / userItemMap.size() > map.getValue()) {
+				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size() - map.getValue());
+			} else if (totalExpenditure / 4 < map.getValue()) {
+				eachShareMap.put(map.getKey() + " should receive money", map.getValue() - totalExpenditure / userItemMap.size());
+			} else {
+				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size());
+			}
+		}
+
+		return eachShareMap;
 	}
 
 }

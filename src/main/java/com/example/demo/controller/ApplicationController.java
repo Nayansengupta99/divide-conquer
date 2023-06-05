@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,5 +42,19 @@ public class ApplicationController {
 	public UserModel saveUser(@RequestBody UserModel model) {
 		return appService.saveUser(model);
 	}
+	
+	@GetMapping("/totalexpenditure/{tripName}")
+	public Map<String,Double> getEveryOneTotalExpenditure(@PathVariable String tripName){
+		return appService.getEveryOneTotalExpenditure(tripName);
+	}
+	
+	@GetMapping("/share/{tripName}")
+	public Map<String,Double> getEveryOneShare(@PathVariable String tripName){
+		return appService.getEachUserShare(tripName);
+	}
+	
+	
+	
+	
 
 }

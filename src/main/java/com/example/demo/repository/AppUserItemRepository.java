@@ -7,6 +7,7 @@ import com.example.demo.model.UserItemModel;
 public interface AppUserItemRepository extends MongoRepository<UserItemModel, Integer>{
 
 UserItemModel findByUserName(String userName);
+//UserItemModel findByUserNameAndTripName(String userName,String tripName);
 
 
 
