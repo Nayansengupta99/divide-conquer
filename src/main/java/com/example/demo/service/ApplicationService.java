@@ -206,7 +206,7 @@ public class ApplicationService {
 		for (Map.Entry<String, Double> map : userItemMap.entrySet()) {
 			if (totalExpenditure / userItemMap.size() > map.getValue()) {
 				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size() - map.getValue());
-			} else if (totalExpenditure / 4 < map.getValue()) {
+			} else if (totalExpenditure / userItemMap.size() < map.getValue()) {
 				eachShareMap.put(map.getKey() + " should receive money", map.getValue() - totalExpenditure / userItemMap.size());
 			} else {
 				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size());
