@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,15 +22,12 @@ public class ApplicationController {
 	@Autowired
 	private ApplicationService appService;
 
-	@GetMapping("/items")
+	@GetMapping("/users")
 	public List<UserModel> getAllUsers() {
 		return appService.getAllUsers();
 	}
 
-	@GetMapping("/{userName}")
-	public UserItemModel findUserItemByName(@PathVariable String userName) {
-		return appService.findUserItemByUserName(userName);
-	}
+
 
 	@PostMapping("/saveuseritems")
 	public UserItemModel saveUserItems(@RequestBody UserItemModel model) {
@@ -51,6 +47,11 @@ public class ApplicationController {
 	@GetMapping("/share/{tripName}")
 	public Map<String,Double> getEveryOneShare(@PathVariable String tripName){
 		return appService.getEachUserShare(tripName);
+	}
+	
+	@GetMapping("/getuseritem/{userName}")
+	public UserItemModel findUserItemModelByUserName(@PathVariable String userName) {
+		return appService.findUserItemByUserName(userName);
 	}
 	
 	
