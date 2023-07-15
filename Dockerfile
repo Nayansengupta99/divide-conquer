@@ -12,4 +12,4 @@ FROM openjdk:17-jdk-slim
 COPY --from=build /target/DivideAndConquer-0.0.1-SNAPSHOT.jar DivideAndConquer.jar
 # ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","demo.jar"]
+ENTRYPOINT ["java","-jar","DivideAndConquer.jar"]
