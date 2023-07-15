@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,7 @@ import com.example.demo.service.ApplicationService;
 
 @RestController
 @RequestMapping("divcon")
+@CrossOrigin(origins ="http://localhost:4200/",maxAge = 3600)
 public class ApplicationController {
 
 	@Autowired
@@ -35,7 +38,7 @@ public class ApplicationController {
 	}
 
 	@PostMapping("/saveuser")
-	public UserModel saveUser(@RequestBody UserModel model) {
+	public String saveUser(@RequestBody UserModel model) {
 		return appService.saveUser(model);
 	}
 	
@@ -52,6 +55,11 @@ public class ApplicationController {
 	@GetMapping("/getuseritem/{userName}")
 	public UserItemModel findUserItemModelByUserName(@PathVariable String userName) {
 		return appService.findUserItemByUserName(userName);
+	}
+	
+	@GetMapping("/trips")
+	public List<String> getAllTripModels(){
+		return appService.getAllTripModels();
 	}
 	
 	

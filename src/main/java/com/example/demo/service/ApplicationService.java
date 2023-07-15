@@ -4,7 +4,9 @@ import static org.springframework.data.mongodb.core.FindAndModifyOptions.options
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -27,6 +30,8 @@ import com.example.demo.repository.AppUserItemRepository;
 import com.example.demo.repository.AppUserRepository;
 import com.example.demo.util.Util;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 public class ApplicationService {
 
@@ -40,7 +45,7 @@ public class ApplicationService {
 	private MongoOperations mongoOperations;
 
 	public long generateSequence(String seqName) {
-
+		
 		DatabaseSequence counter = mongoOperations.findAndModify(query(where("_id").is(seqName)),
 				new Update().inc("seq", 1), options().returnNew(true).upsert(true), DatabaseSequence.class);
 		return !Objects.isNull(counter) ? counter.getSeq() : 1;
@@ -55,8 +60,10 @@ public class ApplicationService {
 		return userItemRepo.findAll();
 	}
 
-	public UserModel saveUser(UserModel model) {
-		return userRepo.save(model);
+	public String saveUser(UserModel model) {
+		 userRepo.save(model);
+		 
+		 return "Details are successfully saved for "+ model.getUserName();
 	}
 
 	public UserModel findUserByName(String userName) {
@@ -65,6 +72,17 @@ public class ApplicationService {
 
 	public UserItemModel findUserItemByUserName(String userName) {
 		return userItemRepo.findByUserName(userName);
+	}
+	
+	public List<String> getAllTripModels(){
+		List<UserItemModel> userItemList=getAllUserAlongWithItems();
+		Set<String> tripModelNames=new HashSet<String>();
+		
+		for(UserItemModel m:userItemList) {
+			tripModelNames.add(m.getTripModel().getTripName());
+		}
+		List<String> tripNames=new ArrayList<>(tripModelNames);
+		return tripNames;
 	}
 
 	public TripModel getTripDetailsForTripName(String tripName) {
@@ -82,7 +100,8 @@ public class ApplicationService {
 	}
 
 	public UserItemModel saveUserItems(UserItemModel model) {
-
+		
+		
 		if (findUserItemByUserName(model.getUserName()) == null
 				&& getTripDetailsForTripName(model.getTripModel().getTripName()) == null) {
 
