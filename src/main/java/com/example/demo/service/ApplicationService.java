@@ -4,7 +4,6 @@ import static org.springframework.data.mongodb.core.FindAndModifyOptions.options
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +44,7 @@ public class ApplicationService {
 	private MongoOperations mongoOperations;
 
 	public long generateSequence(String seqName) {
-		
+
 		DatabaseSequence counter = mongoOperations.findAndModify(query(where("_id").is(seqName)),
 				new Update().inc("seq", 1), options().returnNew(true).upsert(true), DatabaseSequence.class);
 		return !Objects.isNull(counter) ? counter.getSeq() : 1;
@@ -61,9 +60,13 @@ public class ApplicationService {
 	}
 
 	public String saveUser(UserModel model) {
-		 userRepo.save(model);
-		 
-		 return "Details are successfully saved for "+ model.getUserName();
+		if (model.getUserName() != null && model.getUserAge() != 0) {
+			userRepo.save(model);
+
+			return "Details are successfully saved for " + model.getUserName();
+		} else {
+			return "Please fill the form properly";
+		}
 	}
 
 	public UserModel findUserByName(String userName) {
@@ -73,15 +76,15 @@ public class ApplicationService {
 	public UserItemModel findUserItemByUserName(String userName) {
 		return userItemRepo.findByUserName(userName);
 	}
-	
-	public List<String> getAllTripModels(){
-		List<UserItemModel> userItemList=getAllUserAlongWithItems();
-		Set<String> tripModelNames=new HashSet<String>();
-		
-		for(UserItemModel m:userItemList) {
+
+	public List<String> getAllTripModels() {
+		List<UserItemModel> userItemList = getAllUserAlongWithItems();
+		Set<String> tripModelNames = new HashSet<String>();
+
+		for (UserItemModel m : userItemList) {
 			tripModelNames.add(m.getTripModel().getTripName());
 		}
-		List<String> tripNames=new ArrayList<>(tripModelNames);
+		List<String> tripNames = new ArrayList<>(tripModelNames);
 		return tripNames;
 	}
 
@@ -100,8 +103,7 @@ public class ApplicationService {
 	}
 
 	public UserItemModel saveUserItems(UserItemModel model) {
-		
-		
+
 		if (findUserItemByUserName(model.getUserName()) == null
 				&& getTripDetailsForTripName(model.getTripModel().getTripName()) == null) {
 
@@ -224,9 +226,11 @@ public class ApplicationService {
 		Map<String, Double> eachShareMap = new HashMap<String, Double>();
 		for (Map.Entry<String, Double> map : userItemMap.entrySet()) {
 			if (totalExpenditure / userItemMap.size() > map.getValue()) {
-				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size() - map.getValue());
+				eachShareMap.put(map.getKey() + " should give extra",
+						totalExpenditure / userItemMap.size() - map.getValue());
 			} else if (totalExpenditure / userItemMap.size() < map.getValue()) {
-				eachShareMap.put(map.getKey() + " should receive money", map.getValue() - totalExpenditure / userItemMap.size());
+				eachShareMap.put(map.getKey() + " should receive money",
+						map.getValue() - totalExpenditure / userItemMap.size());
 			} else {
 				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size());
 			}
