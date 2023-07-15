@@ -19,7 +19,7 @@ import com.example.demo.service.ApplicationService;
 
 @RestController
 @RequestMapping("divcon")
-@CrossOrigin(origins ="http://localhost:4200/",maxAge = 3600)
+@CrossOrigin(origins ="https://divide-conquer-frontend.vercel.app/",maxAge = 3600)
 public class ApplicationController {
 
 	@Autowired
