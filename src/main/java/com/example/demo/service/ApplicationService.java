@@ -93,6 +93,18 @@ public class ApplicationService {
 		List<String> tripNames = new ArrayList<>(tripModelNames);
 		return tripNames;
 	}
+	
+	public boolean isUserNameHavingUserItem(String userName) {
+		boolean flag=false;
+		List<UserItemModel> userItemList=getAllUserAlongWithItems();
+		for(UserItemModel m:userItemList) {
+			if(m.getUserName().equals(userName)) {
+				flag=true;
+				break;
+			}
+		}
+		return flag;
+	}
 
 	public TripModel getTripDetailsForTripName(String tripName) {
 		TripModel model = null;
@@ -107,10 +119,23 @@ public class ApplicationService {
 		return model;
 
 	}
-
+	
+	public UserItemModel getUserItemByUserNameAndTripName(String userName,String tripName){
+		
+		UserItemModel model=null;
+		List<UserItemModel> userItemList=getAllUserAlongWithItems();
+		
+		for(UserItemModel m:userItemList) {
+			if(m.getUserName().equals(userName) && m.getTripModel().getTripName().equals(tripName)) {
+				return m;
+			}
+		}
+		
+		return model;
+	}
 	public UserItemModel saveUserItems(UserItemModel model) {
 
-		if (findUserItemByUserName(model.getUserName()) == null
+		if (isUserNameHavingUserItem(model.getUserName()) == false
 				&& getTripDetailsForTripName(model.getTripModel().getTripName()) == null) {
 
 			for (ItemModel m : model.getItems()) {
@@ -126,7 +151,7 @@ public class ApplicationService {
 			return model;
 		}
 
-		else if (findUserItemByUserName(model.getUserName()) == null
+		else if (isUserNameHavingUserItem(model.getUserName()) == false
 				&& getTripDetailsForTripName(model.getTripModel().getTripName()) != null) {
 
 			for (ItemModel m : model.getItems()) {
@@ -143,7 +168,7 @@ public class ApplicationService {
 
 		}
 
-		else if (findUserItemByUserName(model.getUserName()) != null
+		else if (isUserNameHavingUserItem(model.getUserName()) != false
 				&& getTripDetailsForTripName(model.getTripModel().getTripName()) == null) {
 
 			for (ItemModel m : model.getItems()) {
@@ -162,8 +187,8 @@ public class ApplicationService {
 		}
 
 		else {
-			UserItemModel modelRef = findUserItemByUserName(model.getUserName());
-
+			UserItemModel modelRef = getUserItemByUserNameAndTripName(model.getUserName(), model.getTripModel().getTripName());
+			if(modelRef!=null) {
 			for (ItemModel m : model.getItems()) {
 				Instant ins = Instant.now();
 				modelRef.getItems().add(m);
@@ -172,7 +197,24 @@ public class ApplicationService {
 			}
 
 			userItemRepo.save(modelRef);
-			return modelRef;
+			
+			return modelRef;}
+			
+			else {
+				
+				for (ItemModel m : model.getItems()) {
+					Instant ins = Instant.now();
+					m.setItemId(generateSequence(ItemModel.SEQUENCE_NAME));
+					m.setPurchaseDate(Date.from(ins));
+				}
+				model.setId(generateSequence(UserItemModel.SEQUENCE_NAME));
+				model.setUserId(findUserByName(model.getUserName()).getUserId());
+				model.getTripModel().setTripId(getTripDetailsForTripName(model.getTripModel().getTripName()).getTripId());
+				userItemRepo.save(model);
+
+				return model;
+				
+			}
 		}
 
 	}
