@@ -60,10 +60,16 @@ public class ApplicationService {
 	}
 
 	public String saveUser(UserModel model) {
-		if (model.getUserName() != null && model.getUserAge() != 0) {
-			userRepo.save(model);
 
-			return "Details are successfully saved for " + model.getUserName();
+		if (model.getUserName() != null && model.getUserAge() != 0) {
+			if (findUserByName(model.getUserName()) != null) {
+
+				return model.getUserName() + " is already registered";
+			} else {
+				userRepo.save(model);
+
+				return "Details are successfully saved for " + model.getUserName();
+			}
 		} else {
 			return "Please fill the form properly";
 		}
