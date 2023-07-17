@@ -59,10 +59,25 @@ public class ApplicationService {
 		return userItemRepo.findAll();
 	}
 
+	public boolean isUserAlreadyRegistered(String userName) {
+		// boolean flag=false;
+		List<UserModel> userList = userRepo.findAll();
+		HashMap<String, String> userMap = new HashMap<String, String>();
+		for (UserModel m : userList) {
+			userMap.put(m.getUserId(), m.getUserName());
+		}
+
+		if (userMap.containsValue(userName)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public String saveUser(UserModel model) {
 
 		if (model.getUserName() != null && model.getUserAge() != 0) {
-			if (findUserByName(model.getUserName()) != null) {
+			if (isUserAlreadyRegistered(model.getUserName())==true) {
 
 				return model.getUserName() + " is already registered";
 			} else {
@@ -70,7 +85,13 @@ public class ApplicationService {
 
 				return "Details are successfully saved for " + model.getUserName();
 			}
-		} else {
+		} else if(model.getUserName() == null || model.getUserAge() == 0) {
+			return "Please fill the form properly";
+		}
+		else if(model.getUserName() != null || model.getUserAge() == 0) {
+			return "Please fill the form properly";
+		}
+		else {
 			return "Please fill the form properly";
 		}
 	}
