@@ -30,8 +30,6 @@ public class ApplicationController {
 		return appService.getAllUsers();
 	}
 
-
-
 	@PostMapping("/saveuseritems")
 	public UserItemModel saveUserItems(@RequestBody UserItemModel model) {
 		return appService.saveUserItems(model);

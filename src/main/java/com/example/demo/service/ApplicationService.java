@@ -43,6 +43,8 @@ public class ApplicationService {
 	@Autowired
 	private MongoOperations mongoOperations;
 
+	public static final Util util = new Util();
+
 	public long generateSequence(String seqName) {
 
 		DatabaseSequence counter = mongoOperations.findAndModify(query(where("_id").is(seqName)),
@@ -77,7 +79,7 @@ public class ApplicationService {
 	public String saveUser(UserModel model) {
 
 		if (model.getUserName() != null && model.getUserAge() != 0) {
-			if (isUserAlreadyRegistered(model.getUserName())==true) {
+			if (isUserAlreadyRegistered(model.getUserName()) == true) {
 
 				return model.getUserName() + " is already registered";
 			} else {
@@ -85,13 +87,11 @@ public class ApplicationService {
 
 				return "Details are successfully saved for " + model.getUserName();
 			}
-		} else if(model.getUserName() == null || model.getUserAge() == 0) {
+		} else if (model.getUserName() == null || model.getUserAge() == 0) {
 			return "Please fill the form properly";
-		}
-		else if(model.getUserName() != null || model.getUserAge() == 0) {
+		} else if (model.getUserName() != null || model.getUserAge() == 0) {
 			return "Please fill the form properly";
-		}
-		else {
+		} else {
 			return "Please fill the form properly";
 		}
 	}
@@ -277,8 +277,6 @@ public class ApplicationService {
 			}
 		}
 
-		Util util = new Util();
-
 		Map<String, Double> sorteduserPriceMap = util.sortByValues(userPriceMap);
 		Map<String, Double> reverseSorteduserPriceMap = new TreeMap<>(Collections.reverseOrder());
 		reverseSorteduserPriceMap.putAll(sorteduserPriceMap);
@@ -300,12 +298,13 @@ public class ApplicationService {
 		for (Map.Entry<String, Double> map : userItemMap.entrySet()) {
 			if (totalExpenditure / userItemMap.size() > map.getValue()) {
 				eachShareMap.put(map.getKey() + " should give extra",
-						totalExpenditure / userItemMap.size() - map.getValue());
+						util.returnUptoTwoDecimalPlaces(totalExpenditure / userItemMap.size() - map.getValue()));
 			} else if (totalExpenditure / userItemMap.size() < map.getValue()) {
 				eachShareMap.put(map.getKey() + " should receive money",
-						map.getValue() - totalExpenditure / userItemMap.size());
+						util.returnUptoTwoDecimalPlaces(map.getValue() - totalExpenditure / userItemMap.size()));
 			} else {
-				eachShareMap.put(map.getKey() + " should give extra", totalExpenditure / userItemMap.size());
+				eachShareMap.put(map.getKey() + " should give extra",
+						util.returnUptoTwoDecimalPlaces(totalExpenditure / userItemMap.size()));
 			}
 		}
 
